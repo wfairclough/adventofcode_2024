@@ -24,8 +24,14 @@ struct Record {
         let spaces = StringParser.spaces
         let decimalDigit = StringParser.decimalDigit
         let decimalParser = { Int(String($0))! } <^> decimalDigit.many1
-        let record = GenericParser.lift3({ a, _, b in Record(a, b)}, parser1: decimalParser, parser2: spaces, parser3: decimalParser)
-        let records = record.separatedBy(newLine)
+        let record = GenericParser.lift4(
+            { a, _, b, _ in Record(a, b)},
+            parser1: decimalParser,
+            parser2: spaces,
+            parser3: decimalParser,
+            parser4: newLine.optional
+        )
+        let records = record.many1
         
         return try records.run(sourceName: "", input: input)
     }
@@ -41,7 +47,7 @@ let filePath = "/Users/will/Development/github/wfairclough/adventofcode_2024/day
 func partA() {
     do {
         let content = try String(contentsOfFile: filePath, encoding: .utf8)
-        let records = try Record.createParser(String(content.prefix(content.count - 1)))
+        let records = try Record.parse(content)
         let sortedA = records.sorted { $0.a < $1.a }.map { $0.a }
         let sortedB = records.sorted { $0.b < $1.b }.map { $0.b }
         let zipped = zip(sortedA, sortedB)
@@ -59,7 +65,7 @@ func partA() {
 func partB() {
     do {
         let content = try String(contentsOfFile: filePath, encoding: .utf8)
-        let records = try Record.parse(String(content.prefix(content.count - 1)))
+        let records = try Record.parse(content)
         let sortedA = records.map { $0.a }
         let similarityScores = records.reduce(into: [Int: Int]()) { (result, record) in
             result[record.b, default: 0] += 1
