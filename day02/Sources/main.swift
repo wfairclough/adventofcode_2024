@@ -6,6 +6,10 @@
 // 530
 // 531
 
+// Correct answer:
+// Part 1: 490
+// Part 2: 536
+
 import SwiftParsec
 
 let sampleInput = """
@@ -52,59 +56,43 @@ enum Dir {
     }
 }
 
-enum Mods {
-    case none
-    case removed(Int, Int)
+enum SafeCheckError: Error {
+    case unsafeLevel(Int, Int)
+    case invalidDirChange(Dir, Dir)
 }
 
 struct Report {
     let levels: [Int]
-    var isSafe: (Bool, Mods) {
+    func isSafe() -> Result<Bool, SafeCheckError> {
         var dir: Dir = .none
-        let checkLevels = { (levels: [Int]) -> Bool in
-            for (i, a) in levels.enumerated() {
-                guard let b = levels[safe: i + 1] else { continue }
-                let diff = b - a
-                switch (diff) {
-                case 1, 2, 3, -1, -2, -3:
-                    break
-                default:
-                    return false
-                }
-                let currDir = Dir.from(integer: diff)
-                switch (dir, currDir) {
-                case (.none, .none):
-                    fallthrough
-                case (.inc, .dec):
-                    fallthrough
-                case (.dec, .inc):
-                    fallthrough
-                case (.inc, .none):
-                    fallthrough
-                case (.dec, .none):
-                    print("Invalid direction change: .\(currDir) \(a) -> \(b) when prev was .\(dir) in \(levels)")
-                    return false
-                case (.none, let d) where d != .none:
-                    dir = d
-                default:
-                    break
-                }
+        for (i, a) in levels.enumerated() {
+            guard let b = levels[safe: i + 1] else { continue }
+            let diff = b - a
+            switch (diff) {
+            case 1, 2, 3, -1, -2, -3:
+                break
+            default:
+                return .failure(.unsafeLevel(i, diff))
             }
-            return true
-        }
-        let safe = checkLevels(levels)
-        guard safe else {
-            for i in 0..<levels.count {
-                let newLevels = levels.removing(at: i)
-                if checkLevels(newLevels) {
-                    print("Fixed by removing \(i):\(levels[i]) in \(levels)")
-                    return (true, .removed(i, levels[i]))
-                }
+            let currDir = Dir.from(integer: diff)
+            switch (dir, currDir) {
+            case (.none, .none):
+                fallthrough
+            case (.inc, .dec):
+                fallthrough
+            case (.dec, .inc):
+                fallthrough
+            case (.inc, .none):
+                fallthrough
+            case (.dec, .none):
+                return .failure(.invalidDirChange(dir, currDir))
+            case (.none, let d) where d != .none:
+                dir = d
+            default:
+                break
             }
-            print("Could not fix: \(levels)")
-            return (false, .none)
         }
-        return (safe, .none)
+        return .success(true)
     }
 }
 
@@ -120,22 +108,80 @@ let reportsParser = reportParser.many1
 
 
 func main() {
-    let file = "/Users/will/Development/github/wfairclough/adventofcode_2024/day02/input.txt"
-     let input = try! String(contentsOfFile: file)
+    let file = CommandLine.arguments[1]
+    let input = try! String(contentsOfFile: file)
 //    let input = sampleInput
     let reports = try! reportsParser.run(sourceName: "", input: input)
-    partA(reports)
-    partB(reports)
+    part1(reports)
+    part2(reports)
 }
 
-func partA(_ reports: [Report]) {
-    let safeReports = reports.map { ($0, $0.isSafe) }.filter { $0.1.0 }
-    print("Safe reports:\n \(safeReports.map { "\($0)" }.joined(separator: "\n"))")
+func part1(_ reports: [Report]) {
+    let (safeReports, unsafeReports) = reports.reduce(into: ([Report](), [Report]())) { (result, report) in
+        switch report.isSafe() {
+        case .success(true):
+            result.0.append(report)
+        case .failure(let error):
+            result.1.append(report)
+            print("Error: \(error) in \(report)")
+        case .success(false):
+            break
+        }
+    }
+    print("Part 1")
+    print("SAFE REPORTS")
+    print("\(safeReports.map { "\($0)" }.joined(separator: "\n"))")
+    print("===========================================================================")
+    print("UNSAFE REPORTS")
+    print("===========================================================================")
+    print("\(unsafeReports.map { "\($0)" }.joined(separator: "\n"))")
+    print("===========================================================================")
     print("Safe report count: \(safeReports.count)")
 }
 
-func partB(_ reports: [Report]) {
-    print("Hello, Part B")
+func part2(_ reports: [Report]) {
+    print("\n\n\n\n")
+    let (safeReports, unsafeReports) = reports.reduce(into: ([Report](), [Report]())) { (result, report) in
+        switch report.isSafe() {
+        case .success(true):
+            result.0.append(report)
+        case .failure(let error):
+            result.1.append(report)
+            print("Error: \(error) in \(report)")
+        case .success(false):
+            break
+        }
+    }
+    let fixedReports = unsafeReports.compactMap { report -> Report? in
+        for i in 0..<report.levels.count {
+            let newLevels = report.levels.removing(at: i)
+            let newReport = Report(levels: newLevels)
+            switch newReport.isSafe() {
+            case .success(true):
+                return newReport
+            case .failure(let error):
+                print("Error: \(error) in \(newReport)")
+            case .success(false):
+                break
+            }
+        }
+        return nil
+    }
+    print("Part 2")
+    print("SAFE REPORTS")
+    print("\(safeReports.map { "\($0)" }.joined(separator: "\n"))")
+    print("===========================================================================")
+    print("UNSAFE REPORTS")
+    print("===========================================================================")
+    print("\(unsafeReports.map { "\($0)" }.joined(separator: "\n"))")
+    print("===========================================================================")
+    print("FIXED REPORTS")
+    print("===========================================================================")
+    print("\(fixedReports.map { "\($0)" }.joined(separator: "\n"))")
+    print("===========================================================================")
+    print("Safe report count: \(safeReports.count)")
+    print("Fixed reports count: \(fixedReports.count)")
+    print("Total Safe reports count: \(safeReports.count + fixedReports.count)")
 }
 
 main()
