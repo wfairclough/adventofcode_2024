@@ -23,6 +23,7 @@ final class Day04Tests: XCTestCase {
         .trimmingCharactersPerLine(in: .whitespaces)
         .trimmingCharacters(in: .newlines))
 
+
     func testBuildGrid() {
         let grid = buildGrid(sample)
         XCTAssertEqual(grid, [
@@ -41,6 +42,58 @@ final class Day04Tests: XCTestCase {
     func testPart1CountXMASOccurances() {
         let grid = buildGrid(sample)
         XCTAssertEqual(grid.count(occuranceseOf: "XMAS"), 18)
+    }
+
+
+    let sample2 = String("""
+        M.M.MM.M.M.
+        .A.A.AA.A..
+        S.S.SSSS.S.
+    """
+        .trimmingCharactersPerLine(in: .whitespaces)
+        .trimmingCharacters(in: .newlines))
+
+    let sample3 = String("""
+        M.M...S.S..
+        .A.....A...
+        S.S...M.M..
+        .A.....A...
+        S.S...M.M..
+    """
+        .trimmingCharactersPerLine(in: .whitespaces)
+        .trimmingCharacters(in: .newlines))
+
+    let xMasMasks: [Grid] = [
+        [
+            ["M", ".", "M"],
+            [".", "A", "."],
+            ["S", ".", "S"],
+        ],
+        [
+            ["S", ".", "S"],
+            [".", "A", "."],
+            ["M", ".", "M"],
+        ],
+        [
+            ["M", ".", "S"],
+            [".", "A", "."],
+            ["M", ".", "S"],
+        ],
+        [
+            ["S", ".", "M"],
+            [".", "A", "."],
+            ["S", ".", "M"],
+        ],
+    ]
+
+    func testPart2CountXMasMasks() {
+        let grid = buildGrid(sample)
+        var count = 0
+        for mask in xMasMasks {
+            count += grid.count(occurancesOfMask: mask)
+            print("count: \(count)")
+        }
+        XCTAssertEqual(count, 9)
     }
 }
 

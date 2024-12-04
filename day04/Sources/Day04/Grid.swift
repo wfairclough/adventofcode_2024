@@ -24,17 +24,41 @@ public extension Grid {
                         let position: Position = (x: x + (i * dir.x), y: y + (dir.y * i))
                         let isInside = isInBounds(position)
                         if !isInside {
-                            // print("dir: \(dir), position: \(position), isInside: \(isInside)")
                             break
                         }
                         let charAtPosition = get(position)
                         let charInWord = wordChars[i]
-                        // print("dir: \(dir), position: \(position), charAtPosition: \(charAtPosition), charInWord: \(charInWord)")
                         if charAtPosition != charInWord {
                             break
                         }
                         if i == (word.count - 1) {
                             count += 1
+                        }
+                    }
+                }
+            }
+        }
+        return count
+    }
+
+    func count(occurancesOfMask mask: Grid, maskSize: Int = 3) -> Int {
+        var count = 0
+        for y in 0..<(self.count - maskSize + 1) {
+            for x in 0..<(self[y].count - maskSize + 1) {
+                mask: for yMask in 0..<mask.count {
+                    for xMask in 0..<mask[yMask].count {
+                        let position: Position = (x: x + xMask, y: y + yMask)
+                        let charAtPosition = get(position)
+                        let charInMask = mask.get((x: xMask, y: yMask))
+                        if charInMask == "." {
+                            continue
+                        }
+                        if charAtPosition != charInMask {
+                            break mask
+                        }
+                        if yMask == (mask.count - 1) && xMask == (mask[yMask].count - 1) {
+                            count += 1
+                            print("\(mask) found at \(position)")
                         }
                     }
                 }
