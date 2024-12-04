@@ -1,0 +1,15 @@
+{
+  "originHash" : "63924c183f00da2aeb91c73df2ea58f4a8d152bfc4a11a0d24785085e74446d9",
+  "pins" : [
+    {
+      "identity" : "swiftparsec",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davedufresne/SwiftParsec.git",
+      "state" : {
+        "revision" : "00ae75a5e9e0fc790056a8b8ebdf2a1833e7117a",
+        "version" : "4.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}
