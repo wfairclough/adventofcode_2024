@@ -12,7 +12,7 @@ import ArgumentParser
 // 7198 correct!
 // Part 2:
 // Attempts:
-
+// 4230 correct!
 
 @main
 struct Day05: ParsableCommand {
@@ -33,12 +33,10 @@ struct Day05Part1: ParsableCommand, FileInput {
     var filename: String
 
     mutating func run() throws {
-        let input = getInput()
-        var (updates, rules) = input.parseAsUpdateAndRules()
-        let splitIndex = updates.partition { $0.isValid(with: rules) }
-        let invalidUpdates = updates[..<splitIndex].map { $0 }
-        let validUpdates = updates[splitIndex...].map { $0 }
-        let _ = invalidUpdates
+        var (updates, rules) = parseAsUpdateAndRules()
+        let partitioned = updates.partitionValidAndInvalid(rules: rules)
+        let validUpdates = partitioned.validUpdates
+        let invalidUpdates = partitioned.invalidUpdates
         print("Number of valid updates: \(validUpdates.count)")
         print("Number of invalid updates: \(invalidUpdates.count)")
         let midPageSum = validUpdates.reduce(0) { $0 + $1.middlePage }
@@ -57,8 +55,14 @@ struct Day05Part2: ParsableCommand, FileInput {
     var filename: String
 
     mutating func run() throws {
-        let input = getInput()
-        print(input)
+        var (updates, rules) = parseAsUpdateAndRules()
+        let partitioned = updates.partitionValidAndInvalid(rules: rules)
+        let invalidUpdates = partitioned.invalidUpdates
+        print("Number of invalid updates: \(invalidUpdates.count)")
+        let correctedUpdates = invalidUpdates.map { $0.fix(with: rules) }
+        let midPageSum = correctedUpdates.reduce(0) { $0 + $1.middlePage }
+        print("Sum of middle pages of corrected updates: \(midPageSum)")
+        
     }
 }
 
@@ -69,6 +73,10 @@ protocol FileInput {
 extension FileInput {
     func getInput() -> String {
         return try! String(contentsOfFile: self.filename, encoding: .utf8)
+    }
+
+    func parseAsUpdateAndRules() -> ([Update], [Int:PrintOrderRule]) {
+        return self.getInput().parseAsUpdateAndRules()
     }
 }
 
