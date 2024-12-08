@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:adventofcode_2024}/day06",
+            "name": "Debug Day06 (day06)",
+            "program": "${workspaceFolder:adventofcode_2024}/day06/.build/debug/Day06",
+            "preLaunchTask": "swift: Build Debug Day06 (day06)"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:adventofcode_2024}/day06",
+            "name": "Release Day06 (day06)",
+            "program": "${workspaceFolder:adventofcode_2024}/day06/.build/release/Day06",
+            "preLaunchTask": "swift: Build Release Day06 (day06)"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:adventofcode_2024}/day07",
+            "name": "Debug Day07 (day07)",
+            "program": "${workspaceFolder:adventofcode_2024}/day07/.build/debug/Day07",
+            "preLaunchTask": "swift: Build Debug Day07 (day07)"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:adventofcode_2024}/day07",
+            "name": "Release Day07 (day07)",
+            "program": "${workspaceFolder:adventofcode_2024}/day07/.build/release/Day07",
+            "preLaunchTask": "swift: Build Release Day07 (day07)"
+        }
+    ]
+}
