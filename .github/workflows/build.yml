@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        # with:
-        #   ref: ${{ github.ref }}
+        with:
+          ref: ${{ github.base_ref }}
 
       - name: Verify Git Ref
         run: |
