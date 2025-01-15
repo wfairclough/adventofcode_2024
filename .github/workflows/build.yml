@@ -1,0 +1,24 @@
+name: Swift Build
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Swift
+        uses: fwal/setup-swift@v1
+        with:
+          swift-version: '6.0'  # Specify the Swift version you need
+
+      - name: Build Swift Package
+        run: swift build
+
+      - name: Run Tests
+        run: swift test
+
