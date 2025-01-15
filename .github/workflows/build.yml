@@ -14,12 +14,14 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Verify Git Ref
-        run: git rev-parse HEAD
+        run: |
+          git rev-parse HEAD
+          git log --oneline
 
       - name: Set up Swift
         uses: fwal/setup-swift@v1
         with:
-          swift-version: '6.0'  # Specify the Swift version you need
+          swift-version: '5.9'  # Specify the Swift version you need
 
       - name: Build Swift Package
         run: swift build
